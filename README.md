@@ -5,6 +5,7 @@
 ## Install
 
 - git clone https://github.com/gilles437/phone0x.git
+- cd phone0x/
 - npm install
 - copy your own values in the .env file
 - node script.js
