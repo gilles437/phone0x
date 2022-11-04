@@ -1,7 +1,5 @@
 require('dotenv').config();
 
-
-
 const phone0x = artifacts.require('phone0x.sol');
 
 const ADDR1 = process.env.ADDR1;

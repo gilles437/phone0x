@@ -43,6 +43,13 @@ const init3 = async () => {
   
     var countCDRsByUser = await myContract.methods.getCDRsCountByUser(ADDR1).call({ from: address });
     console.log(`added 1 CDR: ${countCDRsByUser}`);
+
+    receipt1 = await myContract.methods.addUser(ADDR2, NODEIP2).send({ from: address });
+    console.log(`Transaction hash: ${receipt1.transactionHash}`);
+  
+    var userCreds = await myContract.methods.getUserCreds(ADDR2).call({ from: address });
+    console.log(`New data value: ${web3.utils.toAscii(userCreds)}`);
+
    
   process.exit()
 }  

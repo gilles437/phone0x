@@ -48,6 +48,32 @@ contract phone0x {
         }));
     }
 
+
+   function toString(address account) public pure returns(string memory) {
+    return toString(abi.encodePacked(account));
+}
+
+function toString(uint256 value) public pure returns(string memory) {
+    return toString(abi.encodePacked(value));
+}
+
+function toString(bytes32 value) public pure returns(string memory) {
+    return toString(abi.encodePacked(value));
+}
+
+function toString(bytes memory data) public pure returns(string memory) {
+    bytes memory alphabet = "0123456789abcdef";
+
+    bytes memory str = new bytes(2 + data.length * 2);
+    str[0] = "0";
+    str[1] = "x";
+    for (uint i = 0; i < data.length; i++) {
+        str[2+i*2] = alphabet[uint(uint8(data[i] >> 4))];
+        str[3+i*2] = alphabet[uint(uint8(data[i] & 0x0f))];
+    }
+    return string(str);
+}
+
     /** 
      * @dev Create a new voip node.
      * @param nodeId node id which is the address of the node 
@@ -56,7 +82,8 @@ contract phone0x {
     function addNode(address nodeId, bytes32 nodeIP) public{
         
         require(
-            msg.sender == adminPerson, "Only adminPerson can add a node."
+             (keccak256(abi.encodePacked(toString(msg.sender))) == keccak256(abi.encodePacked(toString(adminPerson)))) 
+            , "Only adminPerson can add a node."
         );
 
         for (uint i = 0; i < nodes.length; i++) {
@@ -82,7 +109,8 @@ contract phone0x {
     function updateNode(address nodeId, bytes32 nodeIP) public{
 
         require(
-            msg.sender == adminPerson, "Only adminPerson can update a node."
+             (keccak256(abi.encodePacked(toString(msg.sender))) == keccak256(abi.encodePacked(toString(adminPerson)))), 
+             "Only adminPerson can update a node."
         );
 
         for (uint i = 0; i < nodes.length; i++) {
@@ -99,7 +127,7 @@ contract phone0x {
     function removeNode(address nodeId) external {
 
         require(
-            msg.sender == adminPerson,
+             (keccak256(abi.encodePacked(toString(msg.sender))) == keccak256(abi.encodePacked(toString(adminPerson)))), 
             "Only adminPerson can add a node."
         );
         
@@ -123,11 +151,6 @@ contract phone0x {
      * @param nodeId node id which is the address of the node 
      */
     function getNodeIP(address nodeId) public view returns (bytes32 nodeIP) {
-    
-        // require(
-        //     msg.sender == adminPerson,
-        //     "Only adminPerson can get a node info."
-        // );       
 
         nodeIP = "";
         for (uint i = 0; i < nodes.length; i++) {
@@ -147,7 +170,7 @@ contract phone0x {
     function addUser(address userId, bytes32 userCreds) public {
     
         require(
-            msg.sender == adminPerson,
+             (keccak256(abi.encodePacked(toString(msg.sender))) == keccak256(abi.encodePacked(toString(adminPerson)))), 
             "Only adminPerson can add a user."
         );       
         //ignore demand if empty credentials
@@ -164,7 +187,7 @@ contract phone0x {
     function updateUser(address userId, bytes32 userCreds) public {
     
         require(
-            msg.sender == adminPerson,
+             (keccak256(abi.encodePacked(toString(msg.sender))) == keccak256(abi.encodePacked(toString(adminPerson)))), 
             "Only adminPerson can add a user."
         );       
         //update only if credentials are not empty
@@ -180,7 +203,7 @@ contract phone0x {
     function removeUser(address userId) public {
         
          require(
-            msg.sender == adminPerson,
+             (keccak256(abi.encodePacked(toString(msg.sender))) == keccak256(abi.encodePacked(toString(adminPerson)))), 
             "Only adminPerson can remove a user."
         );     
 
@@ -193,11 +216,6 @@ contract phone0x {
      * @param userId user id which is the wallet address of the user 
      */
     function getUserCreds(address userId) public view returns (bytes32 userCreds){
-    
-        require(
-            msg.sender == adminPerson,
-            "Only adminPerson can get a user info."
-        );       
 
         userCreds = users[userId].userVoipCredentials;
         return userCreds;
@@ -277,11 +295,7 @@ contract phone0x {
      * @param userId id of the caller
      */
     function getCDRsCountByUser(address userId) public view returns (uint count){
-
-        require(
-            msg.sender == adminPerson,
-            "Only adminPerson can get a user CDRs info."
-        );       
+ 
         uint myCount = 0;
         for (uint i = 0; i < CDRs.length; i++) {
             if ( CDRs[i].addrCaller == userId ) {
@@ -304,12 +318,7 @@ contract phone0x {
                                 uint startCallDate, 
                                 int32 callDuration, 
                                 address nodeIdCallOperator, 
-                                address nodeIdCDRWriter ){
-
-        require(
-            msg.sender == adminPerson,
-            "Only adminPerson can get a CDRs user info."
-        );       
+                                address nodeIdCDRWriter ){  
 
         uint counter;
         uint i = 0;
@@ -338,10 +347,6 @@ contract phone0x {
      */
     function getCDRsCountByNodeOperator(address nodeId) public view returns (uint count){
 
-        require(
-            msg.sender == adminPerson,
-            "Only adminPerson can get a user CDRs info."
-        );       
         uint myCount = 0;
         for (uint i = 0; i < CDRs.length; i++) {
             if ( CDRs[i].nodeIdCallOperator == nodeId ) {
@@ -366,11 +371,6 @@ contract phone0x {
                                 address nodeIdCallOperator, 
                                 address nodeIdCDRWriter
     ){
-
-        require(
-            msg.sender == adminPerson,
-            "Only adminPerson can get CDRs nodes info."
-        );       
 
         uint counter;
         uint i = 0;
